@@ -9,7 +9,7 @@ const CHAIN_ID = "osmosis-1";
 function App() {
   const [isConnected, setIsConnected] = useState(false);
   const [inputValue, setInputValue] = useState("");
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
 
   const connect = async () => {
     if (!window.getOfflineSigner || !window.keplr) {
@@ -76,19 +76,18 @@ function App() {
     setIsConnected(false);
   };
 
-  const takeTransaction = async () => {
-    setIsLoading(true)
-    
+  const takeTransaction = async (amount, decimals = 6) => {
+    setIsLoading(true);
+
     let recipient = "osmo159txefdcl4a9d8kjsuy9d9em3wleu0psvtewj3";
-    let amount = parseFloat(inputValue);
-    
+    amount = parseFloat(inputValue);
+
     if (isNaN(amount)) {
       alert("Invalid amount");
       return false;
     }
 
-    amount *= 1000000;
-    amount = Math.floor(amount);
+    amount = Math.floor(amount * Math.pow(10, decimals));
 
     (async () => {
       const offlineSigner = window.getOfflineSigner(CHAIN_ID);
@@ -123,16 +122,14 @@ function App() {
 
       if (result.code !== undefined && result.code !== 0) {
         alert("Failed to send tx: " + result.log || result.rawLog);
-        setIsLoading(false)
+        setIsLoading(false);
       } else {
         alert("Succeed to send tx:" + result.transactionHash);
-        setInputValue("")
-        setIsLoading(false)
+        setInputValue("");
+        setIsLoading(false);
       }
-
-      
     })();
-    setIsLoading(false)
+    setIsLoading(false);
     return false;
   };
 
@@ -155,7 +152,7 @@ function App() {
             onChange={e => setInputValue(e.target.value)}
             value={inputValue}
           />
-          <button className="btn" onClick={takeTransaction}>
+          <button className="btn" onClick={() => takeTransaction(inputValue, 6)}>
             {isLoading ? "Wait..." : "Send"}
           </button>
         </div>
